@@ -2,8 +2,8 @@ name: Eksporter data fra Back4App
 
 on:
   schedule:
-    - cron: '7 * * * *'
-  workflow_dispatch:
+    - cron: '7 * * * *'   # hver time, 7 min over (UTC)
+  workflow_dispatch:       # lar deg kjøre den manuelt
 
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-        - name: Hent toppliste
+      - name: Hent toppliste
         shell: bash
         run: |
           mkdir -p public
@@ -46,4 +46,10 @@ jobs:
                     ]
                   }' \
             > public/toplist.json
-            > public/toplist.json
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: public
+
+      - id: deployment
+        uses: actions/deploy-pages@v5
