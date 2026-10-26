@@ -1,0 +1,37 @@
+name: Eksporter data fra Back4App
+
+on:
+  schedule:
+    - cron: '7 * * * *'   # hver time, 7 min over (UTC)
+  workflow_dispatch:       # lar deg kjøre den manuelt
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Hent data
+        run: |
+          mkdir -p public
+          curl -sf "https://parseapi.back4app.com/users?limit=500&keys=username,Poeng2026" \
+          -H "X-Parse-Application-Id: ${{ secrets.B4A_APP_ID }}" \
+          -H "X-Parse-REST-API-Key: ${{ secrets.B4A_REST_KEY }}" \
+          | jq -c '.results' > public/data.json
+         
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
