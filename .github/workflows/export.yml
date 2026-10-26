@@ -2,8 +2,8 @@ name: Eksporter data fra Back4App
 
 on:
   schedule:
-    - cron: '7 * * * *'   # hver time, 7 min over (UTC)
-  workflow_dispatch:       # lar deg kjøre den manuelt
+    - cron: '7 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,17 +21,23 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Hent data
+      - name: Hent toppliste
+        shell: bash
         run: |
           mkdir -p public
-          curl -sf "https://parseapi.back4app.com/users?limit=500&keys=username,Points2026" \
-          -H "X-Parse-Application-Id: ${{ secrets.B4A_APP_ID }}" \
-          -H "X-Parse-REST-API-Key: ${{ secrets.B4A_REST_KEY }}" \
-          | jq -c '.results' > public/data.json
-         
-      - uses: actions/upload-pages-artifact@v4
+          curl -sf -G "https://parseapi.back4app.com/users" \
+            -H "X-Parse-Application-Id: ${{ secrets.B4A_APP_ID }}" \
+            -H "X-Parse-REST-API-Key: ${{ secrets.B4A_REST_KEY }}" \
+            --data-urlencode 'where={"Points2026":{"$exists":true}}' \
+            --data-urlencode 'order=-Points2026' \
+            --data-urlencode 'limit=500' \
+            --data-urlencode 'keys=username,Points2026' \
+            | jq -c '[.results | to_entries[] | {rank: (.key + 1), name: .value.username, points: .value.Points2026}]' \
+            > public/toplist.json
+
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
