@@ -2,8 +2,9 @@ name: Eksporter data fra Back4App
 
 on:
   schedule:
-    - cron: '7 * * * *'   # hver time, 7 min over (UTC)
-  workflow_dispatch:       # lar deg kjøre den manuelt
+    - cron: '1 9-23 * * *'   # hver time fra 09:07 til 23:07 norsk tid
+      timezone: 'Europe/Oslo'
+  workflow_dispatch:
 
 permissions:
   contents: read
