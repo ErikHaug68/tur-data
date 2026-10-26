@@ -21,7 +21,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Hent toppliste
+        - name: Hent toppliste
         shell: bash
         run: |
           mkdir -p public
@@ -45,4 +45,5 @@ jobs:
                         }
                     ]
                   }' \
+            > public/toplist.json
             > public/toplist.json
