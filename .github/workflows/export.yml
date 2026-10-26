@@ -29,9 +29,9 @@ jobs:
           -H "X-Parse-REST-API-Key: ${{ secrets.B4A_REST_KEY }}" \
           | jq -c '.results' > public/data.json
          
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
